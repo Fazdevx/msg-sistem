@@ -14,13 +14,8 @@
     }
   ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "server/api/index.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "client"
-    }
+    { "src": "/api/(.*)", "dest": "/api" },
+    { "src": "/assets/(.*)", "dest": "/assets/:1" },
+    { "src": "/(.*)", "dest": "/" }
   ]
 }
