@@ -204,10 +204,10 @@ export function BandejaPage() {
             </div>
             <div className="divide-y divide-border">
               {filtered.map((msg) => {
-                const dests = msg.destinatarios || [];
-                const destNombres = dests.map((d) => d.usuario ? `${d.usuario.nombre} ${d.usuario.apellido}` : "Usuario").join(", ");
-                const rem = msg.remitente;
-                const isUnread = tab !== "enviados" && msg.leido === false;
+                const dests = Array.isArray(msg?.destinatarios) ? msg.destinatarios : [];
+                const destNombres = dests.map((d) => d?.usuario ? `${d.usuario.nombre} ${d.usuario.apellido}` : "Usuario").join(", ");
+                const rem = msg?.remitente || {};
+                const isUnread = tab !== "enviados" && msg?.leido === false;
                 return (
                   <div
                     key={msg.id}

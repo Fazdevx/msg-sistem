@@ -14,9 +14,10 @@ authRouter.post("/login", async (req, res) => {
     checkSupabase();
     const { email, password } = req.body;
     const result = await withTimeout(sbAnon.auth.signInWithPassword({ email, password }), 10000);
-    const { data, error } = result;
+    const authData = result?.data || result;
+    const error = result?.error;
     if (error) return res.status(400).json({ error: error.message });
-    res.json(data);
+    res.json(authData);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -28,15 +29,17 @@ authRouter.get("/me", async (req, res) => {
     const token = req.headers.authorization?.replace("Bearer ", "");
     if (!token) return res.status(401).json({ error: "Token requerido" });
 
-    const { data: { user } } = await sb.auth.getUser(token);
+    const authResult = await sb.auth.getUser(token);
+    const user = authResult?.data?.user;
     if (!user) return res.status(401).json({ error: "No autorizado" });
 
-    const { data: usuario } = await sb
+    const usuarioResult = await sb
       .from("usuarios")
-      .select("*, areas(nombre)")
+      .select("id, nombre, apellido, rol, area_id, areas(nombre)")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
+    const usuario = usuarioResult?.data || null;
     res.json({ user, usuario });
   } catch (err) {
     res.status(500).json({ error: err.message });
