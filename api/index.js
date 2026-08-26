@@ -1,3 +1,7 @@
 export default async function handler(req, res) {
-  return res.status(200).json({ ok: true, timestamp: new Date().toISOString() });
+  try {
+    res.json({ ok: true, timestamp: new Date().toISOString() });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 }
