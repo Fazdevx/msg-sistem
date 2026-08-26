@@ -1,6 +1,6 @@
 import { Router } from "express";
 import multer from "multer";
-import { sb } from "../supabase.js";
+import { sb, checkSupabase } from "../supabase.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { uploadFile } from "../storage.js";
 
@@ -12,6 +12,14 @@ const upload = multer({
 });
 
 mensajesRouter.use(authMiddleware);
+mensajesRouter.use((req, res, next) => {
+  try {
+    checkSupabase();
+    next();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 function getPagination(req) {
   const page = Math.max(1, parseInt(req.query.page) || 1);

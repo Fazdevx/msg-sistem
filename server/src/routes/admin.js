@@ -1,9 +1,17 @@
 import { Router } from "express";
-import { sb } from "../supabase.js";
+import { sb, checkSupabase } from "../supabase.js";
 import { authMiddleware } from "../middleware/auth.js";
 
 export const adminRouter = Router();
 adminRouter.use(authMiddleware);
+adminRouter.use((req, res, next) => {
+  try {
+    checkSupabase();
+    next();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // Obtener datos de administración
 adminRouter.get("/data", async (req, res) => {

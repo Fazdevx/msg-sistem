@@ -1,8 +1,9 @@
-import { sb } from "./supabase.js";
+import { sb, checkSupabase } from "./supabase.js";
 
 const BUCKET = "documentos";
 
 export async function uploadFile(file, mensajeId) {
+  checkSupabase();
   const ext = file.originalname.split(".").pop();
   const path = `${mensajeId}/${Date.now()}.${ext}`;
 

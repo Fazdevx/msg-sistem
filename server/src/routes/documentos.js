@@ -1,9 +1,17 @@
 import { Router } from "express";
-import { sb } from "../supabase.js";
+import { sb, checkSupabase } from "../supabase.js";
 import { authMiddleware } from "../middleware/auth.js";
 
 export const documentosRouter = Router();
 documentosRouter.use(authMiddleware);
+documentosRouter.use((req, res, next) => {
+  try {
+    checkSupabase();
+    next();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 documentosRouter.get("/", async (req, res) => {
   // Get IDs of messages that have documents
