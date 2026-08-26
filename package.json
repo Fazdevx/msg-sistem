@@ -2,11 +2,15 @@
   "name": "galileo-gestion-escolar",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:server": "cd server && npm run dev",
     "dev:client": "cd client && npm run dev",
     "install:all": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "dependencies": {
+    "serverless-http": "^3.2.0"
   },
   "devDependencies": {
     "concurrently": "^9.0.0"
