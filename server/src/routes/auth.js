@@ -3,11 +3,18 @@ import { sb, sbAnon, checkSupabase } from "../supabase.js";
 
 export const authRouter = Router();
 
+const withTimeout = (promise, ms = 10000) =>
+  Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error("Tiempo de espera agotado en auth")), ms)),
+  ]);
+
 authRouter.post("/login", async (req, res) => {
   try {
     checkSupabase();
     const { email, password } = req.body;
-    const { data, error } = await sbAnon.auth.signInWithPassword({ email, password });
+    const result = await withTimeout(sbAnon.auth.signInWithPassword({ email, password }), 10000);
+    const { data, error } = result;
     if (error) return res.status(400).json({ error: error.message });
     res.json(data);
   } catch (err) {
