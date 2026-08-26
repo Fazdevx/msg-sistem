@@ -16,15 +16,14 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api"
+      "dest": "server/api/index.js"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "/assets/:1"
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
-      "dest": "/"
+      "dest": "client/dist/index.html"
     }
   ]
 }
