@@ -70,7 +70,7 @@ export function BandejaPage() {
     initialPageParam: 1,
   });
 
-  const mensajes = data?.pages?.flatMap((p) => p.data) || [];
+  const mensajes = (data?.pages || []).flatMap((p) => (Array.isArray(p?.data) ? p.data : [])).filter(Boolean);
 
   const filtered = mensajes.filter((msg) => {
     if (tab === "pendientes") return msg.estado === "pendiente";
@@ -110,7 +110,7 @@ export function BandejaPage() {
     if (selectedIds.size === filtered.length) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(filtered.map((m) => m.id)));
+      setSelectedIds(new Set(filtered.map((m) => m?.id).filter(Boolean)));
     }
   };
 
@@ -203,14 +203,22 @@ export function BandejaPage() {
               <span className="w-20 text-right">Fecha</span>
             </div>
             <div className="divide-y divide-border">
-              {filtered.map((msg) => {
-                const dests = Array.isArray(msg?.destinatarios) ? msg.destinatarios : [];
-                const destNombres = dests.map((d) => d?.usuario ? `${d.usuario.nombre} ${d.usuario.apellido}` : "Usuario").join(", ");
+              {filtered.map((msg, i) => {
+                if (!msg || msg.id == null) return null;
+                const dests = Array.isArray(msg?.destinatarios) ? msg.destinatarios.filter(Boolean) : [];
+                const destNombres = dests.map((d) => {
+                  if (!d) return "Usuario";
+                  if (d.usuario && (d.usuario.nombre || d.usuario.apellido)) {
+                    return `${d.usuario.nombre || ""} ${d.usuario.apellido || ""}`.trim();
+                  }
+                  if (d.area_id) return "Área";
+                  return "Usuario";
+                }).join(", ");
                 const rem = msg?.remitente || {};
                 const isUnread = tab !== "enviados" && msg?.leido === false;
                 return (
                   <div
-                    key={msg.id}
+                    key={msg.id || i}
                     className={`group flex items-start sm:items-center gap-3 px-4 py-3 border-b last:border-b-0 hover:bg-accent/20 transition-colors cursor-pointer ${
                       isUnread ? "bg-primary/[0.02]" : ""
                     }`}

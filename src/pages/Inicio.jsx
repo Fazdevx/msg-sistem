@@ -18,7 +18,7 @@ export function InicioPage() {
     queryFn: () => api.recibidos(1, 5),
   });
   const totalNoLeidos = noLeidos?.total ?? 0;
-  const ultimos = mensajesData?.data || [];
+  const ultimos = (mensajesData?.data || []).filter(Boolean);
 
   const stats = [
     { label: "No leídos", value: totalNoLeidos, icon: Mail, color: "bg-orange-50 dark:bg-orange-950/30 text-orange-600 dark:text-orange-400", bg: "bg-orange-500/10" },
@@ -100,8 +100,10 @@ export function InicioPage() {
               </div>
             ) : (
               <div className="divide-y divide-border">
-                {ultimos.map((msg) => (
-                  <Link key={msg.id} to={`/mensajes/${msg.id}`}
+                {ultimos.map((msg, i) => {
+                  if (!msg) return null;
+                  return (
+                  <Link key={msg.id || i} to={`/mensajes/${msg.id}`}
                     className="flex items-center gap-3 px-4 py-3 hover:bg-accent/30 transition-colors group">
                     <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary shrink-0">
                       {msg.remitente?.nombre?.[0]}{msg.remitente?.apellido?.[0]}
@@ -121,7 +123,8 @@ export function InicioPage() {
                     </div>
                     <span className="text-[10px] text-muted-foreground shrink-0">{timeAgo(msg.created_at)}</span>
                   </Link>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

@@ -9,16 +9,22 @@ import { documentosRouter } from "./routes/documentos.js";
 export const app = express();
 
 app.use(compression());
-app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173", credentials: true }));
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "http://localhost:5173",
+  "http://localhost:3000",
+].filter(Boolean);
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true);
+    if (allowedOrigins.includes(origin) || /\.vercel\.app$/.test(new URL(origin).hostname)) {
+      return cb(null, true);
+    }
+    cb(null, true);
+  },
+  credentials: true,
+}));
 app.use(express.json({ limit: "10mb" }));
-
-app.use((req, res, next) => {
-  req.setTimeout(30000, () => {
-    res.status(503).json({ error: "Tiempo de espera agotado" });
-  });
-  res.setTimeout(30000);
-  next();
-});
 
 app.use((req, res, next) => {
   const start = Date.now();
